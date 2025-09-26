@@ -49,16 +49,23 @@ callbacks:{
     async jwt({ token, user }: { token: any; user?: any }) {
         if(user){
             token.id = user.id,
-            token.role = user.role;
+            token.email = user.email;
+        
+            if(user.email === "admin@gmail.com"){
+                token.role = "admin";
+            }else{
+                token.role = "user";
+            }
         }
+
         return token;
     },
     async session({session, token}: {session: any; token?: any}){
         if(session.user){
             session.user.id = token.id as string;
-            session.role = token.role;
+            session.user.role = token.role as string;
         }
-        return session
+        return session;
     },
 },
 pages:{

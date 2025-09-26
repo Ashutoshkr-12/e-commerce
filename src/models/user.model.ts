@@ -9,8 +9,8 @@ const userSchema = new Schema<IUser>({
   cartItems: [
     {
       productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product", // link to Product schema
+        type: Schema.Types.ObjectId,
+        ref: "product", // link to Product schema
         required: true,
       },
       quantity: {

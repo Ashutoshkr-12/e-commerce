@@ -36,7 +36,7 @@ export type IProduct = {
 
 export type UserAddress = {
     _id?: string;
-    userId: string;
+    userId: string | null;
     fullName: string;
     phoneNumber: number;
     pincode: string;
@@ -52,11 +52,22 @@ export type IOrderItem = {
 
 export type IOrder = {
    _id?: string;
-    userId: string;
+    userId: IUser;
     items?: IOrderItem[];
     amount: number;
     address: UserAddress;
     status?: "Order Placed" | "Order Delivered" | "Order Cancelled"; // Remove question mark
     date: number;
 
+}
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
+  }
 }

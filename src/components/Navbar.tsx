@@ -17,12 +17,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const Navbar = () => {
-  const { admin, router } = useAppContext()!;
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { admin, router,user } = useAppContext()!;
+
+ 
 
   return (
     <nav className="flex items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300 ">
@@ -129,7 +129,7 @@ const Navbar = () => {
                     <DropdownMenuShortcut>
                       <Briefcase size={24} />
                     </DropdownMenuShortcut>
-                  </DropdownMenuItem>{" "}
+                  </DropdownMenuItem>
                 </Link>
 
                 <DropdownMenuItem>

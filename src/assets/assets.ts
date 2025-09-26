@@ -22,8 +22,10 @@ import star_dull_icon from '@/assets/star_dull_icon.svg';
 import decrease_arrow from '@/assets/decrease_arrow.svg';
 import increase_arrow from '@/assets/increase_arrow.svg'
 import arrow_right_icon_colored from '@/assets/arrow_right_icon_colored.svg'
+import checkmark from '@/assets/checkmark.png'
 export const assets ={
   arrow_right_icon_colored,
+  checkmark,
   decrease_arrow,
   increase_arrow,
 jbl_soundbox_image,

@@ -15,7 +15,7 @@ const Product = () => {
 
     const { id } = useParams();
 
-    const { products, router, addToCart } = useAppContext()!;
+    const { products , addToCart } = useAppContext()!;
 
     const [mainImage, setMainImage] = useState<string | null>(null);
     const [productData, setProductData] = useState<IProduct | undefined>(undefined);
@@ -118,7 +118,7 @@ const Product = () => {
                         <button onClick={() => addToCart(String(productData._id))} className="w-full py-3.5  hover:bg-gray-700 transition">
                             Add to Cart
                         </button>
-                        <button onClick={() => { addToCart(String(productData._id)); router.push('/cart') }} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
+                        <button onClick={() =>  addToCart(String(productData._id))} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
                             Buy now
                         </button>
                     </div>

@@ -19,21 +19,29 @@ const Loginpage = () => {
   const [email, setEmail] = useState('');
   const [ password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async(e: React.FormEvent<HTMLElement>)=>{
     e.preventDefault();
-    const result = await signIn("credentials",{
-      email,
-      password,
-      redirect: false
-    }
-    )
-    if(!result?.ok){
-      setError(String(result?.error))
-    }else{
-      router.push('/')
-    }
+    setLoading(true)
+   try {
+     const result = await signIn("credentials",{
+       email,
+       password,
+       redirect: false
+     }
+     )
+     if(!result?.ok){
+       setError(String(result?.error))
+     }else{
+       router.push('/')
+     }
+   } catch (error) {
+    console.error("error in making user logging in:",error)
+   } finally {
+    setLoading(false);
+   }
   }
   return (
      <div className=" bg-muted  flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
@@ -85,9 +93,13 @@ const Loginpage = () => {
                   </div>
                 </div>
                 {error && <p className="text-red-600 font-semibold text-[18px]">{error}</p>}
-                <Button type="submit" className="w-full">
+               
+               {loading ? (<Button type="submit" className="w-full bg-orange-300">
+                  Logging iin.....
+                </Button>) : (<Button type="submit" className="w-full bg-orange-500">
                   Login
-                </Button>
+                </Button>)}
+                
               </div>
               <div className="text-center text-sm">
                 Don&apos;t have an account?

@@ -19,14 +19,16 @@ const Registerpage = () => {
   const [name, setName] = useState< string >("");
   const [email, setEmail] = useState < string >("");
   const [password, setPassword] = useState < string >("");
+  const [loading, setLoading]= useState(false);
   const router = useRouter();
   const [error, setError] = useState('');
 
 
   const handleRegister = async(e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
-   
+   setLoading(true);
   try {
+
      const res = await fetch('/api/auth/register',{
         method: "POST",
         headers:{
@@ -59,6 +61,8 @@ const Registerpage = () => {
   } catch (error) {
     console.error('Error in Creating user from frontend:',error);
     alert(error);
+  } finally{
+    setLoading(false);
   }
   
   }
@@ -125,9 +129,12 @@ const Registerpage = () => {
                   </div>
                   {error && <p className="text-red-600 font-semibold text-[18px]">{error}</p>}
                 </div>
-                <Button type="submit" className="w-full">
+                {loading? (<> <Button type="submit" className="w-full bg-orange-300">
+                  creating Account...
+                </Button></> ): ( <Button type="submit" className="w-full bg-orange-500">
                   Create Account
-                </Button>
+                </Button>)}
+               
               </div>
               <div className="text-center text-sm">
                 Already have an account?

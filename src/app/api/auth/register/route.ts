@@ -33,7 +33,7 @@ export async function POST(req: NextRequest){
           password:hashedPassword,
           role: 'user'
       })
-      console.log('user created',user) //TODO: Remove
+    //  console.log('user created',user) //TODO: Remove
   
       return NextResponse.json({
           success: true,
