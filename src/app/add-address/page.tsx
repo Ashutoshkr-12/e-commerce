@@ -6,9 +6,10 @@ import Image from "next/image";
 import {  useState } from "react";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const AddAddress = () => {
-    const {data: session, status} = useSession();
+    const {data: session} = useSession();
 
     const [ userId, setUserId] = useState< string | undefined>('');
     const [fullName, setFullName] = useState('');
@@ -17,11 +18,13 @@ const AddAddress = () => {
     const [area, setArea] = useState('');
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const onSubmitHandler = async (e: any) => {
         e.preventDefault();
-        
-      if(status === "authenticated"){
+        setLoading(true);
+      if(session){
 setUserId(session?.user?.id)
     }
         try {
@@ -44,11 +47,14 @@ setUserId(session?.user?.id)
             console.log(data)
             if(res.ok){
                 toast('Address saved');
-            }else{
-                toast("Error in saving address")
+                  router.push('/cart')
             }
+
         } catch (error) {
             console.error("Error in sending address from frontend:",error);
+        }finally{
+            setLoading(false);
+          
         }
 
     }
@@ -88,7 +94,6 @@ setUserId(session?.user?.id)
                         />
                         <textarea
                             className="px-2 py-2.5 focus:border-orange-500 transition border border-gray-500/30 rounded outline-none w-full text-gray-500 resize-none"
-                            type= "text"
                             rows={4}
                             name="area"
                             placeholder="Address (Area and Street)"
@@ -114,9 +119,12 @@ setUserId(session?.user?.id)
                             />
                         </div>
                     </div>
-                    <button type="submit" className="max-w-sm w-full mt-6 bg-orange-600 text-white py-3 hover:bg-orange-700 uppercase">
+                    {loading ? (<> <button type="submit" className="max-w-sm w-full mt-6 bg-orange-400 text-white py-3 hover:bg-orange-700 uppercase">
+                     saving address .....
+                    </button></>) : (<> <button type="submit" className="max-w-sm w-full mt-6 bg-orange-600 text-white py-3 hover:bg-orange-700 uppercase">
                         Save address
-                    </button>
+                    </button></>)}
+                   
                 </form>
                 <Image
                     className="md:mr-16 mt-16 md:mt-0"

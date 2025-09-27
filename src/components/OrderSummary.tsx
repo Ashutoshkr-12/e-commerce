@@ -10,18 +10,27 @@ const OrderSummary = () => {
 
   const {  getCartCount, getCartAmount } = useAppContext()!;
   const router = useRouter();
-   const [selectedAddress, setSelectedAddress] = useState< UserAddress | null>(null);
+   const [selectedAddress, setSelectedAddress] = useState< UserAddress | undefined>(undefined);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [userAddresses, setUserAddresses] = useState<UserAddress[] >([]);
 
   const fetchUserAddresses = async () => {
     const res = await fetch("/api/user-addresses",{
-      method: "GET"
+      method: "GET",
+      credentials: "include"
     })
+
+    console.log('res from the address serverr',res)
+
+    if(!res.ok){
+      console.log("Failed to fetch data:",res.status);
+    }
+
     const data = await res.json();
-    if(data.success && Array.isArray(data.address)){
-    setUserAddresses(data.address as UserAddress[]);
+    //console.log('address data:',data)
+    if(data.success && Array.isArray(data.data)){
+    setUserAddresses(data.data as UserAddress[]);
     }else{
       setUserAddresses([]);
     }
@@ -43,6 +52,7 @@ const OrderSummary = () => {
     fetchUserAddresses();
   }, [])
 
+  //console.log('user address:',userAddresses)
   return (
     <div className="w-full md:w-96 bg-gray-500/5 p-5">
       <h2 className="text-xl md:text-2xl font-medium ">

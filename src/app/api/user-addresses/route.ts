@@ -41,7 +41,7 @@ export async function POST(req: NextRequest){
 export async function GET(){
 
     try {
-        const { data: session} = await getServerSession(authOptions);
+        const session = await getServerSession(authOptions);
 
         if(!session || !session.user.id){
             return NextResponse.json({
@@ -56,7 +56,7 @@ export async function GET(){
         return NextResponse.json({
             success: true,
             message:"Data fetched",
-            address
+            data: address,
         },{ status: 200})
     
     } catch (error) {
