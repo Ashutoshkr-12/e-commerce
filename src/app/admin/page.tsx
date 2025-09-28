@@ -63,30 +63,36 @@ const AddProduct = () => {
   return (
     <div className="flex-1 min-h-screen flex flex-col justify-between">
       <form onSubmit={handleSubmit} className="md:p-10 p-4 space-y-5 max-w-lg">
-        <div>
+     
           <p className="text-base font-medium">Product Image</p>
           <div className="flex flex-wrap items-center gap-3 mt-2">
 
-            {[0,1,2,3].map((index) => (
-              <label key={index} htmlFor={`image${index}`}>
-                <input accept="image/*" 
-                type="file" 
-                id={`image${index}`} 
-                hidden
-                 onChange={(e) => handleFileChange(index, e.target.files?.[0] || null)} />
-               {files[index]? ( <Image
-                  key={index}
-                  className="max-w-24 cursor-pointer"
-                  src={files[index] ? URL.createObjectURL(files[index]!) : <ImagePlus size={28}/>}
-                  alt={`photo${index + 1}`}
-                  width={100}
-                  height={100}
-                />) : (<ImagePlus size={40} className="text-gray-500" />)}
-              </label>
-            ))}
+{[0, 1, 2, 3].map((index) => (
+  <label key={index} htmlFor={`image${index}`} className="cursor-pointer">
+    <input
+      accept="image/*"
+      type="file"
+      id={`image${index}`}
+      hidden
+      onChange={(e) => handleFileChange(index, e.target.files?.[0] || null)}
+    />
+    {files[index] ? (
+      <Image
+        className="max-w-24 cursor-pointer"
+        src={URL.createObjectURL(files[index]!)}
+        alt={`photo${index + 1}`}
+        width={100}
+        height={100}
+      />
+    ) : (
+      <div className="w-24 h-24 flex items-center justify-center border border-gray-300 rounded">
+        <ImagePlus size={28} />
+      </div>
+    )}
+  </label>
+))}
 
-          </div>
-        </div>
+     </div>
         <div className="flex flex-col gap-1 max-w-md">
           <label className="text-base font-medium" htmlFor="product-name">
             Product Name
