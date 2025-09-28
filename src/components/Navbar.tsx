@@ -1,156 +1,165 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAppContext } from "@/context/AppContext";
-import { ShoppingCart } from "lucide-react";
-import { CircleUser, Search } from "lucide-react";
 import Image from "next/image";
-import { assets } from "@/assets/assets";
-import { Briefcase } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { CircleUser, ShoppingCart, Search, Briefcase } from "lucide-react";
+import { assets } from "@/assets/assets";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
-const Navbar = () => {
-  const { admin, router,user } = useAppContext()!;
+interface UserSession {
+  id: string;
+  role: string;
+}
 
- 
+const Navbar: React.FC = () => {
+  const router = useRouter();
+
+  const [user, setUser] = useState<UserSession | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Fetch user session from API
+  const fetchUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUser({ id: data.user.id, role: data.user.role });
+          setIsAdmin(data.user.role === "admin");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user session:", error);
+    }
+  };
+
+  // Run once on mount
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   return (
-    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300 ">
+    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300">
+      {/* Logo */}
       <Image
-        className="cursor-pointer rounded-3xl w-28 md:w-32"
-        onClick={() => router.push("/")}
         src={assets.logo}
         alt="logo"
+        className="cursor-pointer rounded-3xl w-28 md:w-32"
+        onClick={() => router.push("/")}
       />
-      <div className="flex items-center gap-4 lg:gap-8 max-md:hidden">
-        <Link href="/" className="hover:text-gray-900 transition">
-          Home
-        </Link>
-        <Link href="/all-products" onClick={()=> router.refresh()} className="hover:text-gray-900 transition">
-          Shop
-        </Link>
-        <Link href="/about-us" className="hover:text-gray-900 transition">
-          About Us
-        </Link>
-        <Link href="/contact" className="hover:text-gray-900 transition">
-          Contact
-        </Link>
 
-        {admin && (
+      {/* Desktop Links */}
+      <div className="hidden lg:flex items-center gap-8">
+        <Link href="/">Home</Link>
+        <Link href="/all-products" onClick={() => router.refresh()}>Shop</Link>
+        <Link href="/about-us">About Us</Link>
+        <Link href="/contact">Contact</Link>
+
+        {isAdmin && (
           <button
-            onClick={() => router.push("/admin")}
             className="text-xs border px-4 py-1.5 rounded-full"
+            onClick={() => router.push("/admin")}
           >
             Seller Dashboard
           </button>
         )}
       </div>
 
-      <ul className="hidden md:flex items-center gap-4 ">
+      {/* Right-side Icons */}
+      <ul className="hidden md:flex items-center gap-4">
         <Search size={24} />
 
         {user ? (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <CircleUser />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Button
-                    className="w-full"
-                    onClick={() => signOut({ callbackUrl: "/auth/login" })}
-                  >
-                    signOut
-                  </Button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <CircleUser />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Button
+                  className="w-full"
+                  onClick={() => signOut({ callbackUrl: "/auth/login" })}
+                >
+                  Sign Out
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
-          <>
-            <Link href="/auth/login">
-              <button className="flex items-center gap-2 hover:text-gray-900 transition">
-                <CircleUser />
-                Account
-              </button>
-            </Link>
-          </>
+          <Link href="/auth/login">
+            <button className="flex items-center gap-2 hover:text-gray-900 transition">
+              <CircleUser /> Account
+            </button>
+          </Link>
         )}
-        <Link href="/cart" onClick={()=> router.refresh()}  >
+
+        <Link href="/cart" onClick={() => router.refresh()}>
           <ShoppingCart />
         </Link>
       </ul>
 
+      {/* Mobile Menu */}
       <div className="flex items-center md:hidden gap-3">
-        {admin && (
+        {isAdmin && (
           <button
-            onClick={() => router.push("/admin")}
             className="text-xs border px-4 py-1.5 rounded-full"
+            onClick={() => router.push("/admin")}
           >
             Seller Dashboard
           </button>
         )}
 
         {user ? (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <CircleUser />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <Link href="/cart">
-                  <DropdownMenuItem>
-                    cart
-                    <DropdownMenuShortcut>
-                      <ShoppingCart size={24} />
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </Link>
-                <Link href="/my-orders">
-                  <DropdownMenuItem>
-                    my-orders
-                    <DropdownMenuShortcut>
-                      <Briefcase size={24} />
-                    </DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </Link>
-
-                <DropdownMenuItem>
-                  <Button
-                    className="w-full"
-                    onClick={() => signOut({ callbackUrl: "/auth/login" })}
-                  >
-                    signOut
-                  </Button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        ) : (
-          <>
-            <button className="flex items-center gap-2 ">
+          <DropdownMenu>
+            <DropdownMenuTrigger>
               <CircleUser />
-              Account
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+
+              <Link href="/cart">
+                <DropdownMenuItem>
+                  Cart
+                  <DropdownMenuShortcut>
+                    <ShoppingCart size={24} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </Link>
+
+              <Link href="/my-orders">
+                <DropdownMenuItem>
+                  My Orders
+                  <DropdownMenuShortcut>
+                    <Briefcase size={24} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </Link>
+
+              <DropdownMenuItem>
+                <Button
+                  className="w-full"
+                  onClick={() => signOut({ callbackUrl: "/auth/login" })}
+                >
+                  Sign Out
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Link href="/auth/login">
+            <button className="flex items-center gap-2">
+              <CircleUser /> Account
             </button>
-            /
-          </>
+          </Link>
         )}
       </div>
     </nav>

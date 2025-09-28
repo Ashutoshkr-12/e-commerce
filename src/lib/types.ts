@@ -22,7 +22,7 @@ export type IUser = {
 }
 
 export type IProduct = {
-    _id?: string;
+    _id?: string ;
     name: string;
     description: string;
     price: number;

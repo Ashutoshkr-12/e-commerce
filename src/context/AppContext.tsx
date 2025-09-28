@@ -6,13 +6,11 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
 import toast from "react-hot-toast";
 
+
 interface AppContextType {
-  admin: boolean;
-  setAdmin: React.Dispatch<React.SetStateAction<boolean>>;
   router: ReturnType<typeof useRouter>;
   products: IProduct[];
   currency: string;
-  user: {id:string , role: string} | null ;
   getCartAmount: () => number;
   getCartCount: () => number;
   addToCart:( itemId:string) => void;
@@ -33,9 +31,9 @@ export const useAppContext = () => {
 
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<IProduct[]>([]);
-  const [admin, setAdmin] = useState(false);
+
   const [cartItems, setCartItems] = useState<cartItem>({});
-  const [user, setUser] = useState< {id:string; role:string }| null>(null);
+
   const router = useRouter();
   const currency = process.env.NEXT_CURRENCY!
 
@@ -51,6 +49,7 @@ const fetchProducts = async () => {
     if(data.success){
       setProducts(data.productData);
     }
+   
   };
   fetchProducts();
 },[])
@@ -121,6 +120,7 @@ const addToCart = async (itemId: string) => {
   // },[user])
 
 //count the items from the cart
+
 const getCartCount =  () => {
 
   //const data = result.json();
@@ -201,39 +201,9 @@ const createOrder = async (selectedAddress: UserAddress) =>{
 
 
 
-//fetching current user
-useEffect(()=>{
-  const fetchUser = async() =>{
-    try {
-      const res = await fetch("/api/auth/me");
-      if(res.ok){
-        const data = await res.json();
-
-        setUser((prev)=>{
-          if(!prev || prev.id !== data.user.id || prev.role !== data.user.role){
-            return {id: data.user.id, role: data.user.role};
-          }
-          return prev;
-        })
-       // setUser({ id: data.user.id, role: data.user.role});
-        
-       setAdmin((prev) => (prev !== (data.user.role === 'admin') ? data.user.role === 'admin' : prev));
-        //setAdmin(data.user.role === "admin");
-      }
-    } catch (error) {
-      console.error("Error in fetching user session:",error)
-    }
-  }
-  fetchUser();
-
-},[]);
-
-
   const value = {
     createOrder,
-    user,
-    admin,
-    setAdmin,
+
     router,
     products,
     updateCartQuantity,
