@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { CircleUser, ShoppingCart, Search, Briefcase } from "lucide-react";
+import { CircleUser, ShoppingCart, Search, Briefcase, House, PackageSearch } from "lucide-react";
 import { assets } from "@/assets/assets";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -125,6 +125,22 @@ const Navbar: React.FC = () => {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
+              <Link href="/">
+                <DropdownMenuItem>
+                  Home
+                  <DropdownMenuShortcut>
+                    <House  size={24} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/all-products">
+                <DropdownMenuItem>
+                  All products
+                  <DropdownMenuShortcut>
+                    <PackageSearch  size={24} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </Link>
 
               <Link href="/cart">
                 <DropdownMenuItem>
