@@ -67,7 +67,7 @@ export async function POST(req: NextRequest){
        image: uploadedUrls,
      });
  
-     return NextResponse.json({ success: true, product: newProduct });
+     return NextResponse.json({ success: true, data: newProduct });
    } catch (error) {
     console.log("Error in uploading product data from server:",error);
     return NextResponse.json({

@@ -45,7 +45,7 @@ export async function POST(req: NextRequest){
         await user.save();
 
        // console.log(user.cartItems);
-        return NextResponse.json({ success: true, message: "Cart updated" }, { status: 201})
+        return NextResponse.json({ success: true, message: "Cart updated", data: user.cartItems }, { status: 201})
    
     } catch (error) {
         return NextResponse.json({
@@ -91,7 +91,7 @@ export async function GET() {
     }));
 
     return NextResponse.json(
-      { success: true, message: "Cart data successfully fetched", cart: cartWithProducts },
+      { success: true, message: "Cart data successfully fetched", data: cartWithProducts},
       { status: 200 }
     );
   } catch (error) {
@@ -101,4 +101,56 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+export async function PATCH(res: Request){
+  try {
+    const session = await getServerSession(authOptions);
+    if(!session){
+      return NextResponse.json({
+        success: false,
+        error:"Unauthorized"
+      }, { status: 403})
+    };
+
+    await connectDB();
+    const { productId , quantity} = await res.json();
+
+    const user = await User.findById(session.user.id);
+    if(!user){
+      return NextResponse.json({
+        success:false,
+        error: "User not find"
+      }, { status: 404})
+    }
+
+    if(quantity === 0){
+      user.cartItems = user.cartItems.filter(
+        (item: any) => item.productId.toString() !== productId
+      );
+    }else{
+      const existingItem = user.cartItems.find(
+        (item: any) => item.productId.toString() === productId
+      )
+
+      if(existingItem){
+        existingItem.quantity = quantity;
+      }else{
+        user.cartItems.push({ productId, quantity});
+      }
+    }
+
+    await user.save();
+
+    return NextResponse.json({
+      success: true,
+      message: "cart updated"
+    },{ status: 200})
+  } catch (error) {
+    console.error("Error in cartUpdation from server:",error);
+    return NextResponse.json({
+      success: false,
+      error: "Error in cart updation"
+    }, { status: 500})
+  };
 }

@@ -13,7 +13,8 @@ const Cart = () => {
   const router = useRouter();
 
  // console.log('cartItems are: ', cartItems);
-  const cartList = Object.keys(cartItems).map((id)=>{
+  const cartList = Object.keys(cartItems)
+  .map((id)=>{
     const product = products.find((p) => p._id === id);
     if(!product) return null;
     return {
@@ -23,6 +24,17 @@ const Cart = () => {
   }).filter(Boolean);
  // console.log('cart item of user',cartList);
 
+ if(cartList.length === 0){
+  return(
+          <>
+        <Navbar />
+        <div className="flex justify-center items-center h-screen text-gray-500 text-lg">
+          Your cart is empty.
+        </div>
+      </>
+
+  )
+ }
 
   return (
     <>
@@ -63,7 +75,7 @@ const Cart = () => {
                             <Image
                               src={item?.image[0] ?? "/placeholder.png"}
                               alt={String(item?.name)}
-                              className="w-16 h-auto object-cover mix-blend-multiply"
+                              className="w-20 h-16 object-cover mix-blend-multiply"
                               width={1280}
                               height={720}
                             />
@@ -85,7 +97,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 ">${item?.offerPrice}</td>
+                      <td className="py-4 md:px-4 px-1 ">₹{item?.offerPrice}</td>
                       <td className="py-4 md:px-4 px-1">
                         <div className="flex items-center md:gap-2 gap-1">
                           <button onClick={() => updateCartQuantity(String(item?._id), Number(item?.quantity) - 1)}>
@@ -105,7 +117,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1">${(Number(item?.offerPrice) * Number(item?.quantity)).toFixed(2)}</td>
+                      <td className="py-4 md:px-4 px-1">₹{(Number(item?.offerPrice) * Number(item?.quantity)).toFixed(2)}</td>
                     </tr>
                   
                 ))}

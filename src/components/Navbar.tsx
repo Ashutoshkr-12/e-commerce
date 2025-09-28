@@ -36,7 +36,7 @@ const Navbar = () => {
         <Link href="/" className="hover:text-gray-900 transition">
           Home
         </Link>
-        <Link href="/all-products" className="hover:text-gray-900 transition">
+        <Link href="/all-products" onClick={()=> router.refresh()} className="hover:text-gray-900 transition">
           Shop
         </Link>
         <Link href="/about-us" className="hover:text-gray-900 transition">
@@ -90,7 +90,7 @@ const Navbar = () => {
             </Link>
           </>
         )}
-        <Link href="/cart">
+        <Link href="/cart" onClick={()=> router.refresh()}  >
           <ShoppingCart />
         </Link>
       </ul>

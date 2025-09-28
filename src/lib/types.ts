@@ -54,10 +54,12 @@ export type IOrder = {
    _id?: string;
     userId: IUser;
     items?: IOrderItem[];
-    amount: number;
+    totalAmount: number;
     address: UserAddress;
-    status?: "Order Placed" | "Order Delivered" | "Order Cancelled"; // Remove question mark
-    date: number;
+    status: "Placed" | "Delivered" | "Cancelled"; // Remove question mark
+    createdAt? : number | undefined;
+    updatedAt? : number
+ 
 
 }
 

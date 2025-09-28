@@ -1,8 +1,6 @@
 "use client";
-import { productsDummyData, userDummyData } from "@/assets/assets";
+
 import { IProduct } from "@/lib/types";
-import { CloudFog } from "lucide-react";
-import { getServerSession } from "next-auth";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
@@ -20,6 +18,7 @@ interface AppContextType {
   addToCart:( itemId:string) => void;
   cartItems: cartItem;
   updateCartQuantity: (itemId: string, quantity:number) => void;
+  createOrder: (selectedAddress: string) => void;
 }
 
 interface cartItem {
@@ -57,66 +56,69 @@ const fetchProducts = async () => {
 },[])
   
 
-//add product to the cart
- const addToCart = async (itemId: string) => {
-
+//add product to the cart and fetched also
+const addToCart = async (itemId: string) => {
   try {
-      let cartData = structuredClone(cartItems);
-       cartData[itemId] = (cartData[itemId] || 0) + 1;
+    let cartData = structuredClone(cartItems);
+    cartData[itemId] = (cartData[itemId] || 0) + 1;
 
-      const res = await fetch("/api/user-cart",{
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ productId: itemId})
+    const res = await fetch("/api/user-cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ productId: itemId })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      toast.success("Item added to the cart");
+
+      // Update cartItems state
+      const updatedCart: cartItem = {};
+      data.data.forEach((item: any) => {
+        updatedCart[item.productId] = item.quantity; // <-- use productId, not _id
       });
 
-      const data = await res.json();
-    console.log("add to cart response:",data);
-      if(res.ok && data.success){
-        toast.success("Item added to the cart")
-    // setCartItems(prev => ({
-    //   ...prev,
-    //   [itemId]: (prev[itemId] || 0) +1
-    //  }))
-      }else{
-        toast.error("Failed to update cart");
-      }
-      
-  } catch (error) {
-    console.error("Add to cart error:",error);
-      toast.error("Something went wrong");
-  }
-  };
-
-  //fetch users cart items
-  useEffect(()=>{
-    if(!user) return;
-     const fetchUserCart = async()=>{
-
-     try {
-       const result = await fetch("/api/user-cart",{
-        method: "GET",
-       });
-       const data = await result.json();
-   console.log("Cart API response:", data);
-       if(data.success){
-        const cartData: cartItem = {};
-        //console.log('rawdata:', data.cart);
-       data.cart.forEach((item: any)=>{
-          cartData[item.productId] = item.quantity;
-          console.log('Cart data:',cartData
-          )});
-        setCartItems( cartData );
-       }
-     } catch (error) {
-      console.log('Error in fetching user cart:',error);
-     }
+      setCartItems(updatedCart);
+    } else {
+      toast.error("Failed to update cart");
     }
 
-    fetchUserCart();
-  },[user])
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    toast.error("Something went wrong");
+  }
+};
+
+
+
+  //fetch users cart items by get request
+  // useEffect(()=>{
+  //   if(!user) return;
+  //    const fetchUserCart = async()=>{
+  //    try {
+  //      const result = await fetch("/api/user-cart",{
+  //       method: "GET",
+  //      });
+
+  //      const data = await result.json();
+  //          if (data.success) {
+  //       //console.log("Cart API response:", data.data);
+
+  //       // transform into { productId: quantity }
+       
+  //     } else {
+  //       console.log("Cart API error:", data.error || "unknown");
+  //     }
+  //    } catch (error) {
+  //     console.log('Error in fetching user cart:',error);
+  //    }
+  //   }
+
+  //   fetchUserCart();
+  // },[user])
 
 //count the items from the cart
 const getCartCount =  () => {
@@ -135,13 +137,31 @@ const getCartCount =  () => {
   //add quantity to the product
  const updateCartQuantity = async (itemId: string, quantity: number) => {
 
-        let cartData = structuredClone(cartItems);
-        if (quantity === 0) {
-            delete cartData[itemId];
-        } else {
-            cartData[itemId] = quantity;
-        }
-        setCartItems(cartData)
+  try {
+    let cartData = structuredClone(cartItems);
+    if (quantity === 0) {
+        delete cartData[itemId];
+    } else {
+        cartData[itemId] = quantity;
+    }
+    setCartItems(cartData)
+
+    const res = await fetch("/api/user-cart",{
+      method:"PATCH",
+      headers:{
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ productId: itemId, quantity}),
+    })
+
+    const data = await res.json();
+    if(!res.ok || !data.success){
+      console.error("cart Update failed:",data.error)
+    }
+    
+  } catch (error) {
+    console.error("Error in updating cart from frontend:",error)
+  }
 
     }
 
@@ -155,6 +175,31 @@ const getCartAmount = () => {
   return Math.floor(totalAmount * 100) / 100;
 };
   
+const createOrder = async (selectedAddress: string) =>{
+
+  try {
+    const res = await fetch("/api/my-orders", {
+      method: "POST",
+      headers: {
+        "Content-Type" : "application/json"
+      },
+      body: JSON.stringify({address: selectedAddress}),
+    });
+    
+    const data = await res.json();
+    if(data.success){
+      toast.success("Order placed successfully!");
+      router.push("/my-orders")
+    }else {
+      toast.error(data.message || "Failed to place order");
+    }
+    } catch (error) {
+      console.error("Checkout error:",error);
+      toast.error("Something went wrong");
+    }
+  };
+
+
 
 //fetching current user
 useEffect(()=>{
@@ -184,9 +229,8 @@ useEffect(()=>{
 },[]);
 
 
-
-  console.log('cart item user',cartItems)
   const value = {
+    createOrder,
     user,
     admin,
     setAdmin,

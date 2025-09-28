@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 const OrderSummary = () => {
 
-  const {  getCartCount, getCartAmount } = useAppContext()!;
+  const {  getCartCount, getCartAmount, createOrder } = useAppContext()!;
   const router = useRouter();
    const [selectedAddress, setSelectedAddress] = useState< UserAddress | undefined>(undefined);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -21,7 +21,7 @@ const OrderSummary = () => {
       credentials: "include"
     })
 
-    console.log('res from the address serverr',res)
+    //console.log('res from the address serverr',res)
 
     if(!res.ok){
       console.log("Failed to fetch data:",res.status);
@@ -41,10 +41,12 @@ const OrderSummary = () => {
     setIsDropdownOpen(false);
   };
 
-  const createOrder = async () => {
+  const handlePlaceOrder = () => {
     if(!selectedAddress){
-      toast("Select delivery address")
+      toast.error("Select delivery address")
+      return;
     }
+    createOrder(selectedAddress);
 
   }
 
@@ -141,7 +143,7 @@ const OrderSummary = () => {
         </div>
       </div>
 
-      <button onClick={createOrder} className="w-full bg-orange-600 text-white py-3 mt-5 hover:bg-orange-700">
+      <button onClick={handlePlaceOrder} className="w-full bg-orange-600 text-white py-3 mt-5 hover:bg-orange-700">
         Place Order
       </button>
     </div>

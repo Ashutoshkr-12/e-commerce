@@ -125,7 +125,7 @@ const AddProduct = () => {
             </label>
             <select
               id="category"
-              className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
+              className="outline-none md:py-2.5 py-2 px-3 rounded border bg-black"
               onChange={(e) => setCategory(e.target.value)}
               defaultValue={category}
             >
@@ -168,7 +168,7 @@ const AddProduct = () => {
           </div>
         </div>
         {loading ?( <button type="submit" className="px-8 py-2.5 bg-orange-300 text-white font-medium rounded">
-          Adding loading...
+          Adding product...
         </button> ): (<button type="submit" className="px-8 py-2.5 bg-orange-600 text-white font-medium rounded">
           Add
         </button>) }
