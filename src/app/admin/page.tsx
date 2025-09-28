@@ -74,16 +74,20 @@ const AddProduct = () => {
                 id={`image${index}`} 
                 hidden
                  onChange={(e) => handleFileChange(index, e.target.files?.[0] || null)} />
-               {files[index]? ( <Image
-                  key={index}
-                  className="max-w-24 cursor-pointer"
-                  src={files[index] ? URL.createObjectURL(files[index]!) : <ImagePlus size={28}/>}
-                  alt={`photo${index + 1}`}
-                  width={100}
-                  height={100}
-                />) : (<ImagePlus size={40} className="text-gray-500" />)}
-              </label>
-            ))}
+             {files[index] ? (
+  <Image
+    key={index}
+    className="max-w-24 cursor-pointer"
+    src={URL.createObjectURL(files[index]!)}
+    alt={`photo${index + 1}`}
+    width={100}
+    height={100}
+  />
+) : (
+  <div className="w-24 h-24 flex items-center justify-center border border-gray-300 rounded cursor-pointer">
+    <ImagePlus size={28} />
+  </div>
+)}
 
           </div>
         </div>
