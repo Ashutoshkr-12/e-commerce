@@ -5,6 +5,15 @@ import User from "@/models/user.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
+
+interface CartItemData {
+  productId: {
+      offerPrice: number;
+    id: string;
+  };
+  quantity: number;
+}
+
 //placed orders
 export async function POST(req: NextRequest) {
   try {
@@ -36,14 +45,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const items = user.cartItems.map((item: any) => ({
+    const items = user.cartItems.map((item: CartItemData) => ({
       productId: item.productId.id,
       quantity: item.quantity,
     }));
 
     const totalAmount = user.cartItems.reduce(
-      (sum: number, item: any) =>
-        sum + item.productId.offerPrice * item.quantity,
+      (sum: number, item: CartItemData) =>
+        sum + (item.productId.offerPrice || 0)* item.quantity,
       0
     );
 

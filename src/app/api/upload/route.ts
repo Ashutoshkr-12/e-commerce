@@ -4,6 +4,10 @@ import Product from "@/models/product.model";
 import { NextRequest, NextResponse } from "next/server";
 
 
+interface uploadUrl {
+ secure_url: string;
+}
+
 export async function POST(req: NextRequest){
 
    try {
@@ -52,9 +56,9 @@ export async function POST(req: NextRequest){
       // }
     const uploadPromises = files.map(file => uploadToCloudinary(file,"products"));
 
-    const uploadResults = await Promise.all(uploadPromises);
+    const uploadResults = await Promise.all(uploadPromises) as uploadUrl[];
 
-    const uploadedUrls = uploadResults.map((result: any) => result.secure_url);
+    const uploadedUrls: string[] = uploadResults.map((result: uploadUrl) => result.secure_url);
 
     await connectDB();
 
@@ -89,6 +93,7 @@ export async function GET(){
       productData
    }, { status: 201})
  } catch (error) {
+  console.error("Error in product uploading from server:",error)
   return NextResponse.json({
     success: false,
     error:"Error in fetching product data"

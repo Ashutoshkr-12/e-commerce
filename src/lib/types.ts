@@ -36,7 +36,7 @@ export type IProduct = {
 
 export type UserAddress = {
     _id?: string;
-    userId: string | null;
+    userId?: string | null;
     fullName: string;
     phoneNumber: number;
     pincode: string;
@@ -49,6 +49,8 @@ export type IOrderItem = {
     product: IProduct;
     quantity: number;
 }
+
+
 
 export type IOrder = {
    _id?: string;

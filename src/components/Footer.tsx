@@ -1,7 +1,7 @@
 import React from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
-import { useAppContext } from "@/context/AppContext";
+import Link from "next/link";
 
 
 const Footer = () => {
@@ -13,7 +13,7 @@ const Footer = () => {
           <Image className="w-28 md:w-32" src={assets.logo} alt="logo" />
           <p className="mt-6 text-sm">
             Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
+            industry. Lorem Ipsum has been the industry standard dummy text
             ever since the 1500s, when an unknown printer took a galley of type
             and scrambled it to make a type specimen book.
           </p>
@@ -24,16 +24,16 @@ const Footer = () => {
             <h2 className="font-medium mb-5">Company</h2>
             <ul className="text-sm space-y-2">
               <li>
-                <a className="hover:underline transition" href="#">Home</a>
+                <Link className="hover:underline transition" href="/">Home</Link>
               </li>
               <li>
-                <a className="hover:underline transition" href="#">About us</a>
+                <Link className="hover:underline transition" href="/about-us">About us</Link>
               </li>
               <li>
-                <a className="hover:underline transition" href="#">Contact us</a>
+                <Link className="hover:underline transition" href="#">Contact us</Link>
               </li>
               <li>
-                <a className="hover:underline transition" href="#">Privacy policy</a>
+                <Link className="hover:underline transition" href="#">Privacy policy</Link>
               </li>
             </ul>
           </div>

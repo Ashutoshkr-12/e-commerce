@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 
 import Image from "next/image";
@@ -8,70 +8,74 @@ import Navbar from "@/components/Navbar";
 import Loading from "@/components/Loading";
 import { IOrder } from "@/lib/types";
 
+
+
 const MyOrders = () => {
+  const { currency } = useAppContext()!;
 
-    const { currency } = useAppContext()!;
+  const [orders, setOrders] = useState<IOrder[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    const [orders, setOrders] = useState< IOrder[]>([]);
-    const [loading, setLoading] = useState(true);
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch("/api/my-orders", {
+        method: "GET",
+      });
 
-    const fetchOrders = async () => {
-        try {
-            const res = await fetch("/api/my-orders", {
-                method:"GET",
-            });
+      const data = await res.json();
 
-            const data = await res.json()
-
-            if(data.success){
-                setOrders(data.data);
-            }
-
-        } catch (error) {
-            console.error("Error in fetching user order from frontend:", error);
-        }
-       
-        setLoading(false);
+      if (data.success) {
+        setOrders(data.data);
+      }
+    } catch (error) {
+      console.error("Error in fetching user order from frontend:", error);
     }
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
+    setLoading(false);
+  };
 
-    return (
-        <>
-            <Navbar />
-            <div className="flex flex-col justify-between px-6 md:px-16 lg:px-32 py-6 min-h-screen">
-                <div className="space-y-5">
-                    <h2 className="text-lg font-medium mt-6">My Orders</h2>
-                    {loading ? <Loading /> : (<div className="max-w-5xl border-t border-gray-300 text-sm">
-                        {orders.map((order, index) => (
-                            <div key={index} className="flex flex-col md:flex-row gap-5 justify-between p-5 border-b border-gray-300">
-                                <div className="flex-1 flex gap-5 max-w-80">
-                               
-                                    <p className="flex flex-col gap-3">
-                                        <span className="font-medium text-base">
-                                            {order.items?.map((item: any, index) =>
-                                            <div className="p-2 flex gap-3" key={index}>
-                                                     <Image
-                                        className="max-w-20 max-h-24 object-cover"
-                                        src={item.productId.image[0]}
-                                        alt="box_icon"
-                                        width={1280}
-                                        height={720}
-                                    />
-                                    <div>
-                                                <h1>
-                                                { item.productId.name}
-                                                </h1>
-                                        <span>Quantity : {item.quantity}</span></div>
-                                         </div>   
-                                           ) }
-                                        </span>
-                                    </p>
-                                </div>
-                                <div>
-                                    {/* <p>
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  return (
+    <>
+      <Navbar />
+      <div className="flex flex-col justify-between px-6 md:px-16 lg:px-32 py-6 min-h-screen">
+        <div className="space-y-5">
+          <h2 className="text-lg font-medium mt-6">My Orders</h2>
+          {loading ? (
+            <Loading />
+          ) : (
+            <div className="max-w-5xl border-t border-gray-300 text-sm">
+              {orders.map((order, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col md:flex-row gap-5 justify-between p-5 border-b border-gray-300"
+                >
+                  <div className="flex-1 flex gap-5 max-w-80">
+                    <p className="flex flex-col gap-3">
+                      <span className="font-medium text-base">
+                        {order.items?.map((item: any, index) => (
+                          <div className="p-2 flex gap-3" key={index}>
+                            <Image
+                              className="max-w-20 max-h-24 object-cover"
+                              src={item.productId.image[0]}
+                              alt="box_icon"
+                              width={1280}
+                              height={720}
+                            />
+                            <div>
+                              <h1>{item.productId.name}</h1>
+                              <span>Quantity : {item.quantity}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </span>
+                    </p>
+                  </div>
+                  <div>
+                    {/* <p>
                         
                                     <span className="font-medium">{order.address.fullName}</span>
                                         <br />
@@ -83,23 +87,29 @@ const MyOrders = () => {
                                         
                                       
                                     </p>  */}
-                                </div>
-                                <p className="font-medium my-auto">{currency}{order.totalAmount}</p>
-                                <div>
-                                    <p className="flex flex-col">
-                                        <span>Method : COD</span>
-                                        <span>Date :  {new Date(order.createdAt).toLocaleDateString()}</span>
-                                        <span>Payment : Pending</span>
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>)}
+                  </div>
+                  <p className="font-medium my-auto">
+                    {currency}
+                    {order.totalAmount}
+                  </p>
+                  <div>
+                    <p className="flex flex-col">
+                      <span>Method : COD</span>
+                      <span>
+                       Date : {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
+                      </span>
+                      <span>Payment : Pending</span>
+                    </p>
+                  </div>
                 </div>
+              ))}
             </div>
-            <Footer />
-        </>
-    );
+          )}
+        </div>
+      </div>
+      <Footer />
+    </>
+  );
 };
 
 export default MyOrders;

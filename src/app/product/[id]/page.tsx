@@ -20,15 +20,14 @@ const Product = () => {
     const [mainImage, setMainImage] = useState<string | null>(null);
     const [productData, setProductData] = useState<IProduct | undefined>(undefined);
 
-    const fetchProductData = async () => {
+    useEffect(()=>{
+         const fetchProductData = async () => {
         const product = products.find(product => product._id === id);
         setProductData(product);
     }
-
-    useEffect(() => {
-        fetchProductData();
-    }, [id, products.length])
-
+    fetchProductData();
+    },[id,products])
+   
 
     return productData ? (<>
         <Navbar />

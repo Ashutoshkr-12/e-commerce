@@ -21,7 +21,7 @@ const AddAddress = () => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const onSubmitHandler = async (e: any) => {
+    const onSubmitHandler = async (e: React.FormEvent<HTMLElement>) => {
         e.preventDefault();
         setLoading(true);
       if(session){

@@ -1,6 +1,6 @@
 "use client";
 
-import { IProduct } from "@/lib/types";
+import { IProduct, UserAddress } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
@@ -18,7 +18,7 @@ interface AppContextType {
   addToCart:( itemId:string) => void;
   cartItems: cartItem;
   updateCartQuantity: (itemId: string, quantity:number) => void;
-  createOrder: (selectedAddress: string) => void;
+  createOrder: (selectedAddress: UserAddress) => void;
 }
 
 interface cartItem {
@@ -59,7 +59,7 @@ const fetchProducts = async () => {
 //add product to the cart and fetched also
 const addToCart = async (itemId: string) => {
   try {
-    let cartData = structuredClone(cartItems);
+    const cartData = structuredClone(cartItems);
     cartData[itemId] = (cartData[itemId] || 0) + 1;
 
     const res = await fetch("/api/user-cart", {
@@ -77,7 +77,7 @@ const addToCart = async (itemId: string) => {
 
       // Update cartItems state
       const updatedCart: cartItem = {};
-      data.data.forEach((item: any) => {
+      data.data.forEach((item: cartItem) => {
         updatedCart[item.productId] = item.quantity; // <-- use productId, not _id
       });
 
@@ -138,7 +138,7 @@ const getCartCount =  () => {
  const updateCartQuantity = async (itemId: string, quantity: number) => {
 
   try {
-    let cartData = structuredClone(cartItems);
+    const cartData = structuredClone(cartItems);
     if (quantity === 0) {
         delete cartData[itemId];
     } else {
@@ -175,7 +175,7 @@ const getCartAmount = () => {
   return Math.floor(totalAmount * 100) / 100;
 };
   
-const createOrder = async (selectedAddress: string) =>{
+const createOrder = async (selectedAddress: UserAddress) =>{
 
   try {
     const res = await fetch("/api/my-orders", {

@@ -3,6 +3,8 @@ import User from "@/models/user.model";
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from 'bcrypt'
 
+
+
 export const authOptions = {
   providers: [
      CredentialsProvider({
@@ -45,29 +47,24 @@ export const authOptions = {
     }
   })
 ],
-callbacks:{
-    async jwt({ token, user }: { token: any; user?: any }) {
-        if(user){
-            token.id = user.id,
-            token.email = user.email;
-        
-            if(user.email === "admin@gmail.com"){
-                token.role = "admin";
-            }else{
-                token.role = "user";
-            }
-        }
-
-        return token;
+ callbacks: {
+    async jwt({ token, user }: { token: any, user: any }) {
+      if (user) {
+        token.id = (user as any).id;
+        token.email = (user as any).email;
+        token.role = (user as any).role || "user";
+      }
+      return token;
     },
-    async session({session, token}: {session: any; token?: any}){
-        if(session.user){
-            session.user.id = token.id as string;
-            session.user.role = token.role as string;
-        }
-        return session;
+    async session({ session, token }: { session: any, token: any }) {
+      if (session.user) {
+        (session.user as any).id = token.id;
+        (session.user as any).email = token.email;
+        (session.user as any).role = token.role;
+      }
+      return session;
     },
-},
+  },
 pages:{
     signIn: '/login',
     error: "/login",

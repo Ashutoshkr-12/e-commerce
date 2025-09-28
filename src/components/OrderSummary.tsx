@@ -1,5 +1,4 @@
 'use client'
-import { addressDummyData } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import { UserAddress } from "@/lib/types";
 import { useRouter } from "next/navigation";
@@ -46,7 +45,9 @@ const OrderSummary = () => {
       toast.error("Select delivery address")
       return;
     }
-    createOrder(selectedAddress);
+   
+      createOrder(selectedAddress);
+    
 
   }
 

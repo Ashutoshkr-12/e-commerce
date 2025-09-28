@@ -1,12 +1,16 @@
 import connectDB from "@/config/db";
 import { authOptions } from "@/lib/auth";
-import Product from "@/models/product.model";
 import User from "@/models/user.model";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 
 
+interface cartItem {
+
+  productId: { _id: string, name: string, price: number, offerPrice: number, image: string }; // depending on how you store it
+  quantity: number;
+}
 export async function POST(req: NextRequest){
 
     try {
@@ -31,7 +35,7 @@ export async function POST(req: NextRequest){
             }, { status: 402})
         }
 
-        const existingItem = user.cartItems.find((item: any)=>item.productId.toString() === productId);
+        const existingItem = user.cartItems.find((item: cartItem)=>item.productId.toString() === productId);
 
         //console.log("Existing item",existingItem)
         if(existingItem){
@@ -48,6 +52,7 @@ export async function POST(req: NextRequest){
         return NextResponse.json({ success: true, message: "Cart updated", data: user.cartItems }, { status: 201})
    
     } catch (error) {
+      console.error('Error in user cart server:',error)
         return NextResponse.json({
             success: false,
             message: "unable to add items to the cart from the server"
@@ -81,7 +86,7 @@ export async function GET() {
     }
 
     
-    const cartWithProducts = user.cartItems.map((item: any) => ({
+    const cartWithProducts = user.cartItems.map((item: cartItem) => ({
       _id: item.productId._id,
       name: item.productId.name,
       price: item.productId.price,
@@ -126,11 +131,11 @@ export async function PATCH(res: Request){
 
     if(quantity === 0){
       user.cartItems = user.cartItems.filter(
-        (item: any) => item.productId.toString() !== productId
+        (item: cartItem) => item.productId.toString() !== productId
       );
     }else{
       const existingItem = user.cartItems.find(
-        (item: any) => item.productId.toString() === productId
+        (item: cartItem) => item.productId.toString() === productId
       )
 
       if(existingItem){
