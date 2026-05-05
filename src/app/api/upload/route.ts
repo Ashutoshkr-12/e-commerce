@@ -19,7 +19,7 @@ export async function POST(req: NextRequest){
     const price = Number(formData.get("price"));
     const offerPrice = Number(formData.get("offerPrice"));
     const category = formData.get("category") as string;
- 
+
    const files = [
     formData.get("photo1") as File,
     formData.get("photo2") as File,
