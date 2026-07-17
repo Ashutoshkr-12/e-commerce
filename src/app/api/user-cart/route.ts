@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 interface cartItem {
-
   productId: { _id: string, name: string, price: number, offerPrice: number, image: string }; // depending on how you store it
   quantity: number;
 }
