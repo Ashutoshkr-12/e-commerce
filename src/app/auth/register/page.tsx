@@ -13,12 +13,14 @@ import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import toast from "react-hot-toast"
 
 const Registerpage = () => {
 
   const [name, setName] = useState< string >("");
   const [email, setEmail] = useState < string >("");
   const [password, setPassword] = useState < string >("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading]= useState(false);
   const router = useRouter();
   const [error, setError] = useState('');
@@ -40,11 +42,15 @@ const Registerpage = () => {
       });
       
       const data = await res.json();
-      if(data.error){
-        setError(error);
-      }
+      if (!res.ok || !data.success) {
+  setError(data.message || data.error || "Something went wrong");
+  return;
+}
       if(res.ok && data.success){
+        toast(data.message)
+
       try {
+
           const loginRes = await signIn("credentials",{
             email,password,redirect: false
           })
@@ -68,7 +74,6 @@ const Registerpage = () => {
   }
 
 
-
   return (
     <div className=" bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-md flex-col gap-6">
@@ -83,7 +88,7 @@ const Registerpage = () => {
         <CardContent>
           <form onSubmit={handleRegister}>
             <div className="grid gap-6">
-              <div className="flex flex-col gap-4">
+              {/* <div className="flex flex-col gap-4">
              
                 <Button variant="outline" className="w-full">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -94,7 +99,8 @@ const Registerpage = () => {
                   </svg>
                   Login with Google
                 </Button>
-              </div>
+              </div> */}
+
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-card text-muted-foreground relative z-10 px-2">
                   Or continue with
@@ -144,6 +150,7 @@ const Registerpage = () => {
               </div>
             </div>
           </form>
+          
         </CardContent>
       </Card>
     </div>

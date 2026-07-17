@@ -5,6 +5,7 @@ import { AppContextProvider } from "@/context/AppContext";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Provider } from "@/context/Provider";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +40,10 @@ export default function RootLayout({
         </AppContextProvider>
         </ThemeProvider>
         </Provider>
-  
+         <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

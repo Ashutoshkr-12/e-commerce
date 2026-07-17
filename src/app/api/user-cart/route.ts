@@ -19,7 +19,7 @@ export async function POST(req: NextRequest){
         if(!session?.user?.id){
             return NextResponse.json({
                 success: false,
-                error: "Unauthorized"
+                message: "User not found"
             }, { status: 402})
         }
 
@@ -27,11 +27,10 @@ export async function POST(req: NextRequest){
         const { productId } = await req.json();
         //console.log(productId);
         const user = await User.findById(session.user.id);
-//console.log("user session:",user)
         if(!user){
             return NextResponse.json({
                 success: false,
-                error: "User not found"
+                message: "User not found"
             }, { status: 402})
         }
 
@@ -65,7 +64,7 @@ export async function GET() {
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
+        { success: false, message: "Unauthorized" },
         { status: 403 }
       );
     }
@@ -80,7 +79,7 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "User not found" },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
@@ -102,7 +101,7 @@ export async function GET() {
   } catch (error) {
     console.error("error in fetching cart data:", error);
     return NextResponse.json(
-      { success: false, error: "error in fetching cart products" },
+      { success: false, message: "error in fetching cart products" },
       { status: 500 }
     );
   }
@@ -114,7 +113,7 @@ export async function PATCH(res: Request){
     if(!session){
       return NextResponse.json({
         success: false,
-        error:"Unauthorized"
+        message:"Unauthorized"
       }, { status: 403})
     };
 
@@ -125,7 +124,7 @@ export async function PATCH(res: Request){
     if(!user){
       return NextResponse.json({
         success:false,
-        error: "User not find"
+        message: "User not find"
       }, { status: 404})
     }
 
@@ -155,7 +154,7 @@ export async function PATCH(res: Request){
     console.error("Error in cartUpdation from server:",error);
     return NextResponse.json({
       success: false,
-      error: "Error in cart updation"
+      message: "Error in cart updation"
     }, { status: 500})
   };
 }

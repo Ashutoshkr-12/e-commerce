@@ -16,17 +16,62 @@ const Product = () => {
     const { id } = useParams();
 
     const { products , addToCart } = useAppContext()!;
+    const [loading, setLoading] = useState(true);
+const [error, setError] = useState("");
 
     const [mainImage, setMainImage] = useState<string | null>(null);
     const [productData, setProductData] = useState<IProduct | undefined>(undefined);
 
-    useEffect(()=>{
-         const fetchProductData = async () => {
-        const product = products.find(product => product._id === id);
-        setProductData(product);
+    useEffect(() => {
+  if (!products.length) return;
+
+  setLoading(true);
+
+  try {
+    const product = products.find(
+      (product) => product._id === id
+    );
+
+    if (!product) {
+      setError("Product not found");
+      return;
     }
-    fetchProductData();
-    },[id,products])
+
+    setProductData(product);
+    setError("");
+  } catch (err) {
+    console.error(err);
+    setError("Unable to load product");
+  } finally {
+    setLoading(false);
+  }
+}, [id, products]);
+
+
+if (loading) {
+  return <Loading />;
+}
+
+if (error) {
+  return (
+    <>
+      <Navbar />
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold">{error}</h2>
+
+          <button
+            onClick={() => history.back()}
+            className="mt-6 bg-orange-500 px-5 py-2 text-white rounded"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+      <Footer />
+    </>
+  );
+}
    
 
     return productData ? (<>
@@ -59,7 +104,6 @@ const Product = () => {
                                     height={720}
                                 />
                             </div>
-
                         ))}
                     </div>
                 </div>
@@ -114,9 +158,16 @@ const Product = () => {
                     </div>
 
                     <div className="flex items-center mt-10 gap-4">
-                        <button onClick={() => addToCart(String(productData._id))} className="w-full py-3.5  hover:bg-gray-700 transition">
-                            Add to Cart
-                        </button>
+                       <button onClick={async () => {
+    try {
+      await addToCart(String(productData._id));
+    } catch (error) {
+      console.error(error);
+    }
+  }}
+>
+  Add to Cart
+</button>
                         <button onClick={() =>  addToCart(String(productData._id))} className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition">
                             Buy now
                         </button>

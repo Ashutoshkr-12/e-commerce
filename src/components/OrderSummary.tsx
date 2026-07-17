@@ -45,10 +45,7 @@ const OrderSummary = () => {
       toast.error("Select delivery address")
       return;
     }
-   
       createOrder(selectedAddress);
-    
-
   }
 
   useEffect(() => {

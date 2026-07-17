@@ -1,14 +1,14 @@
 "use client";
 
-import { MoveLeftIcon } from "lucide-react";
+import { Link, MoveLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 export default function AboutPage() {
     const router = useRouter();
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-        <MoveLeftIcon size={28} className="border rounded-md" onClick={()=>router.back}/>
+    
+        <MoveLeftIcon size={28} className="border rounded-md" onClick={()=>router.push('/')}/>
       {/* Project Title */}
       <h1 className="text-3xl font-bold ">About Our E-Commerce Project</h1>
 

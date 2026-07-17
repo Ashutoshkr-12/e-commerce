@@ -1,3 +1,4 @@
+// @ts-ignore: allow missing types for next-auth in this project
 'use client'
 import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";

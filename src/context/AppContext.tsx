@@ -23,6 +23,16 @@ interface cartItem {
   [key: string]: number;
 }
 
+
+declare global {
+  interface Window {
+    Razorpay: new (options: any) => {
+      open(): void;
+      on(event: string, callback: (...args: any[]) => void): void;
+    };
+  }
+}
+
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const useAppContext = () => {
@@ -31,13 +41,9 @@ export const useAppContext = () => {
 
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<IProduct[]>([]);
-
   const [cartItems, setCartItems] = useState<cartItem>({});
-
   const router = useRouter();
   const currency = process.env.NEXT_CURRENCY!
-
-  
 
 //fetch all products
 useEffect(()=>{
@@ -53,47 +59,54 @@ const fetchProducts = async () => {
   };
   fetchProducts();
 },[])
-  
 
 //add product to the cart and fetched also
 const addToCart = async (itemId: string) => {
   try {
-    const cartData = structuredClone(cartItems);
-    cartData[itemId] = (cartData[itemId] || 0) + 1;
-
     const res = await fetch("/api/user-cart", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ productId: itemId })
+      credentials: "include",
+      body: JSON.stringify({
+        productId: itemId,
+      }),
     });
 
     const data = await res.json();
 
-    if (res.ok && data.success) {
-      toast.success("Item added to the cart");
-
-      // Update cartItems state
-      const updatedCart: cartItem = {};
-      data.data.forEach((item: cartItem) => {
-        updatedCart[item.productId] = item.quantity; // <-- use productId, not _id
-      });
-
-      setCartItems(updatedCart);
-    } else {
-      toast.error("Failed to update cart");
+    // Show backend error message
+    if (!res.ok || !data.success) {
+      toast.error(data.message || "Failed to add item to cart");
+      return;
     }
+
+    toast.success(data.message || "Item added to cart");
+
+    // Convert array returned from backend to object
+    const updatedCart: cartItem = {};
+
+    data.data.forEach(
+      (item: { productId: string; quantity: number }) => {
+        updatedCart[item.productId] = item.quantity;
+      }
+    );
+
+    setCartItems(updatedCart);
 
   } catch (error) {
     console.error("Add to cart error:", error);
-    toast.error("Something went wrong");
+
+    if (error instanceof Error) {
+      toast.error(error.message);
+    } else {
+      toast.error("Something went wrong");
+    }
   }
 };
 
-
-
-  //fetch users cart items by get request
+//fetch users cart items by get request
   // useEffect(()=>{
   //   if(!user) return;
   //    const fetchUserCart = async()=>{
@@ -175,29 +188,104 @@ const getCartAmount = () => {
   return Math.floor(totalAmount * 100) / 100;
 };
   
-const createOrder = async (selectedAddress: UserAddress) =>{
-
+const createOrder = async (selectedAddress: UserAddress) => {
   try {
-    const res = await fetch("/api/my-orders", {
+    const createOrderRes = await fetch("/api/payments/create-order", {
       method: "POST",
       headers: {
-        "Content-Type" : "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({address: selectedAddress}),
+      body: JSON.stringify({
+        address: selectedAddress,
+      }),
     });
-    
-    const data = await res.json();
-    if(data.success){
-      toast.success("Order placed successfully!");
-      router.push("/my-orders")
-    }else {
-      toast.error(data.message || "Failed to place order");
+
+    const orderData = await createOrderRes.json();
+
+    if (!orderData.success) {
+      toast.error(orderData.message);
+      return;
     }
-    } catch (error) {
-      console.error("Checkout error:",error);
-      toast.error("Something went wrong");
-    }
-  };
+
+    const options = {
+      key: orderData.key,
+
+      amount: orderData.amount,
+
+      currency: orderData.currency,
+
+      name: "Your Store",
+
+      description: "Order Payment",
+
+      order_id: orderData.orderId,
+
+      handler: async (response: any) => {
+
+        const verifyRes = await fetch("/api/payments/verify", {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+
+            address: selectedAddress,
+
+            razorpay_order_id:
+              response.razorpay_order_id,
+
+            razorpay_payment_id:
+              response.razorpay_payment_id,
+
+            razorpay_signature:
+              response.razorpay_signature,
+
+          }),
+
+        });
+
+        const verifyData = await verifyRes.json();
+
+        if (verifyData.success) {
+
+          toast.success("Payment Successful");
+
+          router.push("/my-orders");
+
+        } else {
+
+          toast.error("Payment Verification Failed");
+
+        }
+
+      },
+
+      prefill: {
+        name: "",
+        email: "",
+      },
+
+      theme: {
+        color: "#F97316",
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+
+    razor.on("payment.failed", function () {
+      toast.error("Payment Failed");
+    });
+
+    razor.open();
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Something went wrong");
+  }
+};
 
 
 

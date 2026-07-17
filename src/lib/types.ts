@@ -52,17 +52,40 @@ export type IOrderItem = {
 
 
 
-export type IOrder = {
-   _id?: string;
-    userId: IUser;
-    items?: IOrderItem[];
-    totalAmount: number;
-    address: UserAddress;
-    status: "Placed" | "Delivered" | "Cancelled"; // Remove question mark
-    createdAt? : number | undefined;
-    updatedAt? : number
- 
+export interface IOrder {
+  _id?: string;
 
+  userId?: string;
+
+  items: {
+    productId: string;
+    quantity: number;
+  }[];
+
+  totalAmount: number;
+
+  address?: string;
+
+  status:
+    | "Placed"
+    | "Processing"
+    | "Shipped"
+    | "Delivered"
+    | "Cancelled";
+
+  paymentMethod?: "Razorpay" | "COD";
+
+  paymentStatus?: "Pending" | "Paid" | "Failed" | "Refunded";
+
+  razorpayOrderId?: string;
+
+  razorpayPaymentId?: string;
+
+  razorpaySignature?: string;
+
+  createdAt?: Date;
+
+  updatedAt?: Date;
 }
 
 declare module "next-auth" {

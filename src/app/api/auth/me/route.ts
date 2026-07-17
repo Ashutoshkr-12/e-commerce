@@ -9,7 +9,7 @@ export async function GET(){
     if(!session){
         return NextResponse.json({
             success: true,
-            error: "Not authorized"
+            message: "Not authorized"
         },{ status: 403})
     }
 

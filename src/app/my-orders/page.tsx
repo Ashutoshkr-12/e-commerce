@@ -8,11 +8,8 @@ import Navbar from "@/components/Navbar";
 import Loading from "@/components/Loading";
 import { IOrder } from "@/lib/types";
 
-
-
 const MyOrders = () => {
   const { currency } = useAppContext()!;
-
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -94,11 +91,11 @@ const MyOrders = () => {
                   </p>
                   <div>
                     <p className="flex flex-col">
-                      <span>Method : COD</span>
+                      <span>Method : {order.paymentMethod}</span>
                       <span>
                        Date : {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                       </span>
-                      <span>Payment : Pending</span>
+                      <span>Payment : {order.paymentStatus}</span>
                     </p>
                   </div>
                 </div>
